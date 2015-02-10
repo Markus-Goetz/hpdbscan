@@ -1,0 +1,11 @@
+syntax: glob
+
+nbproject/**
+*.o
+*.txt
+*.csv
+*.out
+*.so
+*.h5
+*.bak
+*.*~
