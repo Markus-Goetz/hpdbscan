@@ -3,7 +3,6 @@
 
 #include <algorithm>
 #include <atomic>
-#include <H5Cpp.h>
 #include <hdf5.h>
 #include <iostream>
 #include <mpi.h>
@@ -44,9 +43,7 @@ Pointz::Pointz(const std::string& filename) :
     this->readFile(filename);
     
     this->m_clusters = new Cluster[this->m_size];
-    std::fill(this->m_clusters, this->m_clusters + this->m_size, NOT_VISITED);
 }
-
 /**
  * Internal Operations
  */
@@ -55,13 +52,13 @@ void Pointz::readFile(const std::string& filename)
     // Open the HDF5 file and the dataset DBSCAN in it    
     try 
     {  
-        H5::H5File file(filename, H5F_ACC_RDWR);        
-        H5::DataSet dset = file.openDataSet(DATASET);
-        H5::DataSpace fileSpace = dset.getSpace();
+        hid_t file = H5Fopen(filename.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);        
+        hid_t dset = H5Dopen1(file, DATASET);
+        hid_t fileSpace= H5Dget_space(dset);
         
         // Read dataset size and calculate chunk size 
         hsize_t count[2];
-        fileSpace.getSimpleExtentDims(count, NULL);
+        H5Sget_simple_extent_dims(fileSpace, count,NULL);
         this->m_totalSize = count[0];
         hsize_t chunkSize =(this->m_totalSize / this->m_mpiSize) + 1;
         hsize_t offset[2] = {this->m_mpiRank * chunkSize, 0};
@@ -76,28 +73,28 @@ void Pointz::readFile(const std::string& filename)
         std::iota(this->m_initialOrder, this->m_initialOrder + this->m_size, this->m_mpiRank * chunkSize);
 
         // Read data
-        H5::DataSpace memSpace(2, count);
-        fileSpace.selectHyperslab(H5S_SELECT_SET, count, offset);   
-        dset.read(m_points, H5::PredType::IEEE_F32LE, memSpace, fileSpace);
+        hid_t memSpace = H5Screate_simple(2, count, NULL);
+        H5Sselect_hyperslab(fileSpace,H5S_SELECT_SET,offset, NULL, count, NULL);
+        H5Dread(dset, H5T_IEEE_F32LE, memSpace, fileSpace,H5P_DEFAULT, m_points);
 
         // Check if there is an "Cluster" dataset in the file
         if (!this->m_mpiRank)
         {
-            htri_t exists = H5Lexists(file.getId(), "Clusters", H5P_DEFAULT);
+            htri_t exists = H5Lexists(file, "Clusters", H5P_DEFAULT);
             if (!exists)
             {
                 hsize_t dims[2] = {this->m_totalSize, 1};
-                H5::DataSpace globalSpace(1, dims);     
-                H5::DataSet clusterSet = file.createDataSet("Clusters", H5::PredType::NATIVE_LONG ,globalSpace);
-                clusterSet.close();
+                hid_t globalSpace = H5Screate_simple(1,dims,NULL);     
+                hid_t clusterSet = H5Dcreate1(file, "Clusters", H5T_NATIVE_LONG ,globalSpace, H5P_DEFAULT);
+                H5Fclose(clusterSet);
             }
         }
 
         // Close file and dataset
-        dset.close();
-        file.close();    
+        H5Dclose(dset);
+        H5Fclose(file);    
     }
-    catch(H5::FileIException error)
+    catch(herr_t error)
     {
         if (!this->m_mpiRank)
         {
@@ -112,28 +109,28 @@ void Pointz::writeClusterToFile(const std::string& filename) const
     try 
     {        
         // Open Dataset
-        H5::H5File file(filename, H5F_ACC_RDWR);        
-        H5::DataSet dset = file.openDataSet("Clusters");
+        hid_t file = H5Fopen(filename.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);        
+        hid_t dset = H5Dopen1(file, "Clusters");
         
         // Create data space
         hsize_t chunkSize =(this->m_totalSize / this->m_mpiSize) + 1;
         hsize_t count[2] = {this->m_size, 1};
         hsize_t start[2] = {this->m_mpiRank * chunkSize , 0};
-        H5::DataSpace memSpace(1, count);  
-        H5::DataSpace fileSpace = dset.getSpace();
+        hid_t memSpace = H5Screate_simple(1, count, NULL);  
+        hid_t fileSpace = H5Dget_space(dset);
         
         // Select area to write
-        fileSpace.selectHyperslab(H5S_SELECT_SET,count,start);
+        H5Sselect_hyperslab(fileSpace,H5S_SELECT_SET, start, NULL, count, NULL);
         
         // Write
-        dset.write(this->m_clusters, H5::PredType::NATIVE_LONG, memSpace, fileSpace);       
+        H5Dwrite(dset, H5T_NATIVE_LONG, memSpace, fileSpace, H5P_DEFAULT, this->m_clusters);       
         
         // Close 
-        dset.close();
-        file.close();
+        H5Dclose(dset);
+        H5Fclose(file);
        
     }
-    catch(H5::FileIException error)
+    catch(herr_t error)
     {
         if (!this->m_mpiRank)
         {
@@ -146,6 +143,11 @@ void Pointz::writeClusterToFile(const std::string& filename) const
 /**
  * Operations
  */
+void Pointz::resetClusters()
+{
+    std::fill(this->m_clusters, this->m_clusters + this->m_size, NOT_VISITED);
+}
+
 void Pointz::mergeNeighborHalos(const size_t lowerHaloBound,const  size_t upperHaloBound, Rules& rules, const Cuts& cuts)
 {
     int sendCounts[this->m_mpiSize];

@@ -100,6 +100,7 @@ public:
      */
     void   mergeNeighborHalos(const size_t lowerHaloBound, const size_t upperHaloBound, Rules& rules, const Cuts& cuts);
     size_t redistributePoints(int* counts, int* displs, int* rCounts, int* rDispls, bool incCluster = false);
+    void   resetClusters();
     void   sortByCell(const CellIndex& index);
     void   sortByOrder(size_t maxDigits, size_t lowerBound, size_t upperBound);
     void   writeClusterToFile(const std::string& filename) const;

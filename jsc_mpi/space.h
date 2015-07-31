@@ -98,7 +98,7 @@ public:
     Cuts computeCuts() const;
     size_t computeScore(const size_t cellId, const CellCounter& cellCounter) const;
     std::vector<size_t> getNeighbors(const size_t cellId) const;
-    size_t regionQuery(const size_t pointIndex, const size_t cell, const std::vector<size_t>& neighborPoints, const float EPS2, std::vector<size_t>& minPointsArea) const;
+    size_t regionQuery(const size_t pointIndex, const std::vector<size_t>& neighborPoints, const float EPS2, std::vector<size_t>& minPointsArea) const;
 };
 
 #endif	// SPACE_H

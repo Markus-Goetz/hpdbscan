@@ -514,7 +514,7 @@ std::vector<size_t> Space::getNeighbors(const size_t cellId) const
     return neighborPoints;
 }
 
-size_t Space::regionQuery(const size_t pointIndex, const size_t cell, const std::vector<size_t>& neighborPoints, const float EPS2, std::vector<size_t>& minPointsArea) const
+size_t Space::regionQuery(const size_t pointIndex, const std::vector<size_t>& neighborPoints, const float EPS2, std::vector<size_t>& minPointsArea) const
 {
     const Coord* point = this->m_points[pointIndex];
     // this MUST be a positive number so that atomicMin will result in correct result with set corePoint bit

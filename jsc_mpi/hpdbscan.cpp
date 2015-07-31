@@ -8,6 +8,7 @@
 #include <set>
 #include <iterator>
 #include <omp.h>
+#include <poppler/Page.h>
 
 /**
  * Constructors
@@ -115,7 +116,7 @@ Rules HPDBSCAN::localDBSCAN(const Space& space, const float epsilon, const size_
         ssize_t clusterId = NOISE;
         if(neighborPoints.size() >= minPoints)
         {
-            clusterId =space.regionQuery(point, cell, neighborPoints, EPS2, minPointsArea);
+            clusterId =space.regionQuery(point, neighborPoints, EPS2, minPointsArea);
         }
 
         if (minPointsArea.size() >= minPoints)
@@ -148,6 +149,8 @@ Rules HPDBSCAN::localDBSCAN(const Space& space, const float epsilon, const size_
  */
 void HPDBSCAN::scan(float epsilon, size_t minPoints)
 {
+    
+    this->m_points.resetClusters();
     Space space(this->m_points, epsilon);
     
     double start = omp_get_wtime();
@@ -157,7 +160,6 @@ void HPDBSCAN::scan(float epsilon, size_t minPoints)
                   << "\tLocal Scan... " << std::flush;
     }
     Rules rules = this->localDBSCAN(space, epsilon, minPoints);
-    printf("I am ready %d in %f\n", m_mpiRank, omp_get_wtime()-start);
     MPI_Barrier(MPI_COMM_WORLD);
     
     if (!this->m_mpiRank)
