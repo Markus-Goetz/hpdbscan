@@ -8,7 +8,6 @@
 #include <set>
 #include <iterator>
 #include <omp.h>
-#include <poppler/Page.h>
 
 /**
  * Constructors
