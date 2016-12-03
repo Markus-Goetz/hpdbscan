@@ -206,7 +206,7 @@ void HPDBSCAN::summarize() const
             ++corePoints;
         }
     }
-    std::cout << "\t" << (clusters.size() - 1) << "\tClusters" << std::endl
+    std::cout << "\t" << (clusters.size() - (noisePoints > 0)) << "\tClusters" << std::endl
               << "\t" << clusterPoints << "\tCluster Points" << std::endl
               << "\t" << noisePoints << "\tNoise Points" << std::endl
               << "\t" << corePoints << "\tCore Points" << std::endl;
