@@ -116,10 +116,10 @@ void Pointz::reorder(size_t maxDigits)
 {    
     std::cout << "\tSorting Points Back... " << std::flush;   
     std::vector<std::vector<size_t> > buckets(maxDigits, std::vector<size_t>(DIGITS));
-    std::vector<size_t> cellBuffer(this->size(), 0);
     std::vector<Point> pointsBuffer(this->size(), Point(this->dimensions(),0));
-    std::vector<size_t> reorderBuffer;
-    reorderBuffer = std::vector<size_t>(this->size());    
+    std::vector<size_t> cellBuffer(this->size(), 0);
+    std::vector<size_t> clusterBuffer(this->size(), 0);
+    std::vector<size_t> reorderBuffer(this->size(), 0);
     
     for (size_t j = 0; j < maxDigits; ++j)
     {
@@ -163,10 +163,12 @@ void Pointz::reorder(size_t maxDigits)
                 pointsBuffer[pos][d] = this->m_points[i][d];
             }
             cellBuffer[pos] = this->m_cells[i];
+            clusterBuffer[pos] = this->m_clusters[i];
             reorderBuffer[pos] = this->m_reorder[i];
         }
         std::copy(pointsBuffer.begin(), pointsBuffer.end(), this->m_points.begin());
         std::copy(cellBuffer.begin(), cellBuffer.end(), this->m_cells.begin());
+        std::copy(clusterBuffer.begin(), clusterBuffer.end(), this->m_clusters.begin());
         std::copy(reorderBuffer.begin(), reorderBuffer.end(), this->m_reorder.begin());
     }
     
