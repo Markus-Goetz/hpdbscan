@@ -39,6 +39,10 @@ Pointz::Pointz(size_t size, size_t dimensions, bool array) :
 void Pointz::sortByCell(size_t maxDigits)
 {
     std::cout << "\tSorting Points... " << std::flush;
+    if (maxDigits > DIGITS)
+    {
+        throw std::invalid_argument("epsilon is too small relative to data space.");
+    }
     
     // reset cluster ids
     std::fill(this->m_clusters.begin(), this->m_clusters.end(), std::numeric_limits<ssize_t>::max());
