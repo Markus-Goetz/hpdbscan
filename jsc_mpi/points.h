@@ -9,6 +9,7 @@
 #include <stddef.h>
 #include <string>
 #include <vector>
+#include <numeric>
 
 #define REORDER true
 #define DATASET "DBSCAN"
