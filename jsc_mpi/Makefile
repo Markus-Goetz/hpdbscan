@@ -14,4 +14,4 @@ debug:
 	$(CC) $(CCDEBUG) $(CCFLAGS) $(SRC) -o $(OUT)
 
 clean:
-	rm $(OUT)
+	-rm $(OUT)
