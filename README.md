@@ -1,15 +1,15 @@
 # HPDBSCAN
 
-Highly parallel DBSCAN (HPDBSCAN) is a shared- and distributed-memory parallel implementation of the Density-Based Spatial Clustering for Applications with Noise (DBSCAN) algorithm. It is written in C++ and may be used as shared library, command line tool of Python module.  
+Highly parallel DBSCAN (HPDBSCAN) is a shared- and distributed-memory parallel implementation of the Density-Based Spatial Clustering for Applications with Noise (DBSCAN) algorithm. It is written in C++ and may be used as shared library and command line tool.  
 
 ## Dependencies
 
 HPDBSCAN requires the following dependencies. Please make sure, that these are installed, before attempting to compile the code.
 
 * CMake 3.10+
-* C++11 compliant compiler (e.g. g++ 4.8+)
-* OpenMP 4.0+
-* (optional) HDF5 1.8+
+* C++11 compliant compiler (e.g. g++ 4.9+)
+* OpenMP 4.0+ (e.g. g++ 4.9+)
+* HDF5 1.8+
 * (optional) Message Passing Interface (MPI) 2.0+
 
 ## Compilation
@@ -20,15 +20,37 @@ HPDBSCAN follows the standard CMake project conventions. Create a build director
 mkdir build && cd build && cmake .. && make
 ```
 
-The provided CMake script checks, but does not install, all of the necessary dependencies listed above.
+The provided CMake script checks, but does not install, all of the necessary dependencies listed above. If no MPI installation is present on the system, an OpenMP-only (i.e. thread-based) version is built.
 
 ## Usage
 
-The typical basic usage of HPDBSCAN is shown below. It assumes that the application is used in a typical high-performance computing setup with multiple distributed nodes and processing cores per node. The data is passed to the application in form of an HDF5 file with 'Data' being the input dataset and results stored in 'Clustering'. 
+HPDBSCAN's command line usage flags are shown below. You may obtain the same message by invoking `hpdbscan -h`:
+
+```
+Highly parallel DBSCAN clustering algorithm
+Usage:
+  HPDBSCAN [OPTION...]
+
+  -h, --help                this help message
+  -m, --minPoints arg       density threshold (default: 2)
+  -e, --epsilon arg         spatial search radius (default: 0.1)
+  -t, --threads arg         utilized threads (default: 4)
+  -i, --input arg           input file (default: data.h5)
+  -o, --output arg          output file (default: data.h5)
+      --input-dataset arg   input dataset name (default: DATA)
+      --output-dataset arg  output dataset name (default: CLUSTERS)
+```
+
+The typical basic usage of HPDBSCAN is shown below. The above line is for single-node-only (e.g. your laptop/PC) execution. The line below shows a typical high-performance computing setup with multiple distributed nodes and processing cores per node. The data is passed to the application in form of an HDF5 file. 
 
 ``` bash
+./hpdbscan -t <THREADS> <PATH_TO_HDF5_FILE>
 mpirun -np <NODES> ./hpdbscan -t <THREADS> <PATH_TO_HDF5_FILE>
 ```
+
+A second file will be created containing a single vector with the labels for each data point at the same index. The labels may be unintuitive at first. The value zero indicates a *noise* point, labels unequal to zero indicate a point belonging to a cluster. Negative cluster values are core points of the respective cluster with the same absolute value. 
+
+For example, a point might have the cluster label -3, indicating it belongs to the cluster with ID 3 and it is a core point. A second might have the cluster label 3, indicating that it also belongs to the cluster with the ID 3, however, it is not a core point of said cluster. Nevertheless, all points with either the cluster labels -3 or 3 belong to the same cluster with the ID 3.
 
 ## Citation
 
@@ -38,7 +60,7 @@ Plain reference
 ```
 Götz, M., Bodenstein, C., Riedel M.,
 HPDBSCAN: highly parallel DBSCAN,
-Proceedings of the Workshop onf Machine Learning in High-Performance Computing Environments, ACM, 2015.
+Proceedings of the Workshop on Machine Learning in High-Performance Computing Environments, ACM, 2015.
 ```
 
 BibTex
