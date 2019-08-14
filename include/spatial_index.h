@@ -482,17 +482,16 @@ class SpatialIndex {
 
         // actually reorder the points out-of-place
         const hsize_t dimensions = m_data.m_chunk[1];
-        const size_t point_offset = lower_bound * dimensions;
-
         Clusters cluster_buffer(items);
         std::vector<size_t> order_buffer(items);
         T* point_buffer = new T[items * dimensions];
 
         for (size_t j = 0; j < maximum_digit_count; ++j) {
             const size_t base = RADIX_POWERS[j];
+            const size_t point_offset = lower_bound * dimensions;
 
             // assign the number to the respective radix bucket
-            for (size_t i = items - 1; i < NOT_VISITED; --i) {
+            for (size_t i = items - 1; i < items; --i) {
                 size_t unit = m_initial_order[i + lower_bound] / base % RADIX_BUCKETS;
                 size_t pos  = --buckets[j][unit];
 

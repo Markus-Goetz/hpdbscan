@@ -296,7 +296,11 @@ public:
         }
     }
 
-    Clusters cluster(const std::string& path, const std::string& dataset, int threads=omp_get_max_threads()) {
+    Clusters cluster(const std::string& path, const std::string& dataset) {
+        return cluster(path, dataset, omp_get_max_threads());
+    }
+
+    Clusters cluster(const std::string& path, const std::string& dataset, int threads) {
         // read in the data
         Dataset data = IO::read_hdf5(path, dataset);
 
