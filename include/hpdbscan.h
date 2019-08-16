@@ -23,17 +23,18 @@
 #include <string>
 #include <vector>
 
-#ifdef WITH_OUTPUT
-#include <iostream>
-#endif
-
 #ifdef WITH_MPI
 #include <mpi.h>
+#endif
+
+#ifdef WITH_OUTPUT
+#include <iostream>
 #endif
 
 #include "atomic.h"
 #include "constants.h"
 #include "dataset.h"
+#include "hdf5_util.h"
 #include "io.h"
 #include "rules.h"
 #include "spatial_index.h"
@@ -469,6 +470,19 @@ public:
 
         // return the results
         return clusters;
+    }
+
+    template <typename T>
+    Clusters cluster(T* data, int dim0, int dim1, int threads) {
+        hsize_t chunk[2] = {static_cast<hsize_t>(dim0), static_cast<hsize_t>(dim1)};
+        Dataset dataset(data, chunk, HDF5_Types<T>::map());
+
+        return cluster<T>(dataset, threads);
+    }
+
+    template <typename T>
+    Clusters cluster(T* data, int dim0, int dim1) {
+        return cluster(data, dim0, dim1, omp_get_max_threads());
     }
 };
 

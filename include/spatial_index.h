@@ -539,11 +539,12 @@ public:
         m_initial_order(data.m_chunk[0]) {
 
         // determine the space dimensions, the corresponding number of cells for each feature dimension
+        #ifdef WITH_MPI
+        MPI_Comm_rank(MPI_COMM_WORLD, &m_rank);
+        MPI_Comm_size(MPI_COMM_WORLD, &m_size);
+        #endif
+
         #ifdef WITH_OUTPUT
-            #ifdef WITH_MPI
-            MPI_Comm_rank(MPI_COMM_WORLD, &m_rank);
-            MPI_Comm_size(MPI_COMM_WORLD, &m_size);
-            #endif
             double start = omp_get_wtime();
 
             #ifdef WITH_MPI
