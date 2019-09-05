@@ -11,6 +11,9 @@ HPDBSCAN requires the following dependencies. Please make sure, that these are i
 * OpenMP 4.0+ (e.g. g++ 4.9+)
 * HDF5 1.8+
 * (optional) Message Passing Interface (MPI) 2.0+
+* (optional) SWIG 3.0+ (Python bindings with and without MPI support)
+* (optional) Python 3.5+ (Python bindings with and without MPI support, requires headers)
+* (optional) mpi4py (Python bindings with MPI support)
 
 ## Compilation
 
@@ -51,6 +54,27 @@ mpirun -np <NODES> ./hpdbscan -t <THREADS> <PATH_TO_HDF5_FILE>
 A second file will be created containing a single vector with the labels for each data point at the same index. The labels may be unintuitive at first. The value zero indicates a *noise* point, labels unequal to zero indicate a point belonging to a cluster. Negative cluster values are core points of the respective cluster with the same absolute value. 
 
 For example, a point might have the cluster label -3, indicating it belongs to the cluster with ID 3 and it is a core point. A second might have the cluster label 3, indicating that it also belongs to the cluster with the ID 3, however, it is not a core point of said cluster. Nevertheless, all points with either the cluster labels -3 or 3 belong to the same cluster with the ID 3.
+
+## Python Bindings
+
+The CMake script will automatically build HPDBSCAN bindings for the Python programming language, if SWIG and Python (with headers) installation are found on the system. Additionally, if your Python installation also provides the mpi4py pip package, MPI support is enabled.
+
+A small programming example is shown below:
+
+``` python
+import hpdbscan
+import numpy as np
+
+data = np.random.rand(100, 3)
+clusterer = hpdbscan.HPDBSCAN(epsilon=0.3, min_points=4)
+clusterer.cluster(data)
+# alternatively
+clusterer.cluster('file.h5', 'data')
+```
+
+The data passed to the binding is expected to be a two-dimensional numpy array, where the first axis is the sample dimension and the second axis the feature dimension. The result is returned as a tuple with the same lenghts as the first data dimension.
+
+Should you want to use the MPI flavor of the binding, please ensure that each MPI rank only receives a disjoint subset of the entire dataset (e.g. equally-sized chunks). After the clustering process each rank will have the labels corresponding to the initially passed data items.
 
 ## Citation
 
