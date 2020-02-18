@@ -65,6 +65,7 @@ class SpatialIndex {
     std::vector<ComputeBounds> m_compute_bounds;
     #endif
 
+public:
     // implementations of the custom omp reduction operations
     static void vector_min(std::vector<T>& omp_in, std::vector<T>& omp_out) {
         for (size_t index = 0; index < omp_out.size(); ++index) {
@@ -87,6 +88,7 @@ class SpatialIndex {
     }
     #pragma omp declare reduction(merge_histograms: CellHistogram: merge_histograms(omp_in, omp_out)) initializer(omp_priv = omp_orig)
 
+private:
     void compute_initial_order() {
         #pragma omp parallel for
         for (size_t i = 0; i < m_data.m_chunk[0]; ++i) {
@@ -748,7 +750,8 @@ public:
 
             // determine euclidean distance to other point
             for (size_t d = 0; d < dimensions; ++d) {
-                offset += std::pow(point[d] - other_point[d], 2);
+		const size_t distance = point[d] - other_point[d];
+                offset += distance * distance;
             }
             // .. if in range, add it to the vector with in range points
             if (offset <= EPS2) {
