@@ -101,7 +101,7 @@ BibTex
 
 ## Contact
 
-If you want to let us know about feature requests, bugs or issues you are kindly referred to the [issue tracker](https://bitbucket.org/markus.goetz/hpdbscan/issues?status=new&status=open).
+If you want to let us know about feature requests, bugs or issues you are kindly referred to the [issue tracker](https://github.com/Markus-Goetz/hpdbscan/issues).
 
 For any other discussion, please write an [e-mail](mailto:markus.goetz@kit.edu).
 
