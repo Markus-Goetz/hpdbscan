@@ -76,6 +76,18 @@ The data passed to the binding is expected to be a two-dimensional numpy array, 
 
 Should you want to use the MPI flavor of the binding, please ensure that each MPI rank only receives a disjoint subset of the entire dataset (e.g. equally-sized chunks). After the clustering process each rank will have the labels corresponding to the initially passed data items.
 
+## Benchmarks
+
+Based on empirical benchmarks HPDBSCAN outperforms other DBSCAN implementation by a signficant margin in terms of execution time. One benchmarking review has been conducted by Helmut Neukirchen \[1\] for example. Beyond that, the repository contains a small benchmarking suite. If you want to redo them, please ensure that you have a Python 3.6+ interpreter and the pip packages `numpy`, `pandas`, `sklearn`, `h5py`, `seaborn` installed and execute the scripts in this order: 1. `download_datasets.py`, 2. `benchmark.py` and 3. `plot.py`.
+
+Below you will find a figure with an execution of the benchmark suite. For each of the three presented datasets, 10 execution time measurement runs have been performed. The plot depicts the average of the execution time and the black bars the standard deviation, i.e. the execution time fluctuation. All runs have been performed on an single server with an Intel Xeon Gold 6126. The thread count was set to 24, the number of hardware cores, for all tools. The numpy used in sklearn is linked against the Intel MKL 2019.1.
+
+![Benchmark](https://raw.githubusercontent.com/Markus-Goetz/hpdbscan/master/benchmarks/benchmark.png)
+
+The benchmark run for `iris` is not a mistake, it just executes subsecond for both tools and exp
+
+\[1\] *Neukirchen, Helmut. Survey and performance evaluation of DBSCAN spatial clustering implementations for big data and high-performance computing paradigms. Technical report VHI-01-2016, Engineering Research Institute, University of Iceland, 2016.*
+
 ## Citation
 
 If you wish to cite HPDBSCAN in your academic work, please use the following reference:
