@@ -74,6 +74,9 @@ IF(SWIG_FOUND)
                 TARGET_LINK_LIBRARIES(hpdbscan-binding PRIVATE ${OpenMP_CXX_FLAGS})
                 TARGET_COMPILE_OPTIONS(hpdbscan-binding PRIVATE ${OpenMP_CXX_FLAGS})
                 TARGET_LINK_LIBRARIES(hpdbscan-binding PRIVATE "${HDF5_LIBRARIES}")
+                
+                # rename the library
+                SET_TARGET_PROPERTIES(hpdbscan-binding PROPERTIES PREFIX "" OUTPUT_NAME _hpdbscan)
             ELSE()
 		MESSAGE("NUMPY NOT FOUND, BUILDINGS WITHOUT BINDINGS")
 	    ENDIF()
@@ -85,6 +88,5 @@ ELSE()
     MESSAGE("SWIG NOT FOUND, BUILDING WITHOUT BINDINGS")
 ENDIF()
 
-# rename the library and binary
+# rename the binary
 SET_TARGET_PROPERTIES(hpdbscan-bin PROPERTIES OUTPUT_NAME hpdbscan)
-SET_TARGET_PROPERTIES(hpdbscan-binding PROPERTIES PREFIX "" OUTPUT_NAME _hpdbscan)
