@@ -197,7 +197,6 @@ private:
         }
 
         // sorting the points and cells out-of-place, memorize the original order
-        #pragma omp parallel for
         for (size_t i = 0; i < items; ++i) {
             const Cell cell = m_cells[i];
             const auto& locator = m_cell_index[cell];
@@ -737,7 +736,7 @@ public:
         return neighboring_points;
     }
 
-    Cluster region_query(const size_t point_index, const std::vector<size_t>& neighboring_points, const float EPS2,
+    Cluster region_query(const size_t point_index, const std::vector<size_t>& neighboring_points, const T EPS2,
                          const Clusters& clusters, std::vector<size_t>& min_points_area) const {
         const size_t dimensions = m_data.m_chunk[1];
         const T* point = static_cast<T*>(m_data.m_p) + point_index * dimensions;
@@ -745,12 +744,12 @@ public:
 
         // iterate through all neighboring points and check whether they are in range
         for (size_t neighbor: neighboring_points) {
-            double offset = 0.0;
+            T offset = 0.0;
             const T* other_point = static_cast<T*>(m_data.m_p) + neighbor * dimensions;
 
             // determine euclidean distance to other point
             for (size_t d = 0; d < dimensions; ++d) {
-		const size_t distance = point[d] - other_point[d];
+		const T distance = point[d] - other_point[d];
                 offset += distance * distance;
             }
             // .. if in range, add it to the vector with in range points
