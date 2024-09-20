@@ -70,10 +70,10 @@ IF(SWIG_FOUND)
                         MESSAGE("MPI FOUND, BUT MPI4PY MISSING, BINDING WILL BE BUILT WITHOUT MPI SUPPORT")
                     ENDIF()
                 ENDIF()
-		TARGET_INCLUDE_DIRECTORIES(hpdbscan-binding PRIVATE ${PYTHON_INCLUDE_DIRS} ${NUMPY_INCLUDE_DIRS})
+                TARGET_INCLUDE_DIRECTORIES(hpdbscan-binding PRIVATE ${PYTHON_INCLUDE_DIRS} ${NUMPY_INCLUDE_DIRS})
                 TARGET_LINK_LIBRARIES(hpdbscan-binding PRIVATE ${OpenMP_CXX_FLAGS})
                 TARGET_COMPILE_OPTIONS(hpdbscan-binding PRIVATE ${OpenMP_CXX_FLAGS})
-		TARGET_INCLUDE_DIRECTORIES(hpdbscan-binding PRIVATE "${HDF5_INCLUDE_DIRS}")
+                TARGET_INCLUDE_DIRECTORIES(hpdbscan-binding PRIVATE "${HDF5_INCLUDE_DIRS}")
                 TARGET_LINK_LIBRARIES(hpdbscan-binding PRIVATE "${HDF5_LIBRARIES}")
                 
                 # rename the library
